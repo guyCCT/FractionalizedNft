@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./FractionalToken.sol";
 
@@ -11,6 +12,7 @@ contract FractionalizedNFT is Ownable {
 
     event NFTFractionalized(uint256 indexed tokenId, address fractionalToken);
     event FractionBurned(uint256 indexed tokenId, address indexed burner, uint256 amount);
+    event NFTBurned(uint256 indexed tokenId);
 
     constructor(address _nftContract) {
         nftContract = IERC721(_nftContract);
@@ -45,7 +47,14 @@ contract FractionalizedNFT is Ownable {
         require(fractionalTokens[tokenId] != address(0), "NFT is not fractionalized");
         FractionalToken fractionalToken = FractionalToken(fractionalTokens[tokenId]);
         require(fractionalToken.balanceOf(msg.sender) >= amount, "Insufficient token balance");
+
         fractionalToken.burn(amount);
         emit FractionBurned(tokenId, msg.sender, amount);
+
+        // Check if all fractional tokens are burned
+        if (fractionalToken.totalSupply() == 0) {
+            ERC721Burnable(address(nftContract)).burn(tokenId);
+            emit NFTBurned(tokenId);
+        }
     }
 }
