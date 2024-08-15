@@ -5,6 +5,21 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IMintableBurnablePausableERC20 is IERC20 {
     /**
+     * @dev Returns the name of the token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the number of decimals the token uses.
+     */
+    function decimals() external view returns (uint8);
+
+    /**
      * @dev Mints `amount` tokens to `account`.
      * Can only be called by the contract owner or an authorized minter.
      */
